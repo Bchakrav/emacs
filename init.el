@@ -12,7 +12,6 @@
 ;; each 100MB of allocated data (the default is on every 0.76MB). This reduces
 ;; the startup time.
 (setq gc-cons-threshold 100000000)
-
 (let ((min-version "28"))
   (when (version< emacs-version min-version)
     (error "This config requires at least Emacs-%s, but you're running %s"
@@ -564,4 +563,37 @@ after it's been byte compiled."
 
 (provide 'init)
 
+(setq c-default-style '((java-mode . "java")
+                        (awk-mode . "awk")
+                        (other . "linux")))
+;; 1. Install and configure Company (the popup UI)
+(use-package company
+  :ensure t
+  :init (global-company-mode))
+
+;; 2. Install and configure LSP Mode
+(use-package lsp-mode
+  :ensure t
+  :hook ((c++-mode . lsp)
+         (c-mode . lsp))
+  :commands lsp)
+
+;; 3. Optional: Better UI for LSP
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+
+(setq company-idle-delay 0.0)         ; Delay until the popup appears (0.0 = instant)
+(setq company-minimum-prefix-length 1) ; Show suggestions after typing just 1 character
+(setq company-tooltip-align-annotations t) ; Aligns type info (int, void, etc.) to the right
+(setq-default company-backends '((company-capf :with company-yasnippet)))
+(use-package lsp-mode
+  :ensure t
+  :hook ((c++-mode . lsp)
+         (c-mode . lsp)
+         (lsp-mode . company-mode)) ; This ensures company starts with lsp
+  :config
+  (setq lsp-clients-clangd-executable "clangd")) ; Explicitly point to the server
+(setq lsp-keep-workspace-alive nil)
+(setq lsp-auto-guess-root t) ; Try to guess the root if none exists
 ;;; init.el ends here
