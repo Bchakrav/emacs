@@ -563,13 +563,28 @@ after it's been byte compiled."
 
 (provide 'init)
 
-(setq c-default-style '((java-mode . "java")
-                        (awk-mode . "awk")
-                        (other . "linux")))
+(setq-default c-basic-offset 8)
+(setq-default indent-tabs-mode t) ; Linux kernel uses tabs, not spaces
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (c-set-style "linux")))
 ;; 1. Install and configure Company (the popup UI)
 (use-package company
   :ensure t
   :init (global-company-mode))
+
+(use-package electric-operator
+  :ensure t
+  :hook (c-mode . electric-operator-mode))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (c-toggle-hungry-state 1)))
+(use-package ws-butler
+  :ensure t
+  :hook (c-mode . ws-butler-mode))
 
 ;; 2. Install and configure LSP Mode
 (use-package lsp-mode
